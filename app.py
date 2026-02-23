@@ -3,7 +3,6 @@ import yfinance as yf
 import requests
 
 def trouver_ticker(recherche):
-    """Trouve le Ticker"""
     url = "https://query2.finance.yahoo.com/v1/finance/search"
     headers = {'User-Agent': 'Mozilla/5.0'} 
     parametres = {'q': recherche} 
@@ -18,7 +17,6 @@ def trouver_ticker(recherche):
     return None
 
 def calculer_tendance(historique, jours_ouvres):
-    """Calcule la variation en pourcentage sur un nombre de jours de cotation."""
     if len(historique) > jours_ouvres:
         prix_actuel = historique['Close'].iloc[-1]
         prix_ancien = historique['Close'].iloc[-jours_ouvres]
@@ -26,7 +24,6 @@ def calculer_tendance(historique, jours_ouvres):
     return None
 
 def formater_grands_nombres(nombre):
-    """Transforme les grands nombres en format lisible (Milliards/Millions)."""
     if nombre is None or nombre == 0:
         return "N/A"
     if nombre >= 1_000_000_000_000:
@@ -38,7 +35,6 @@ def formater_grands_nombres(nombre):
     return f"{nombre:,}"
 
 def recuperer_prix_direct(ticker):
-    """Récupère rapidement le dernier prix d'un actif (pour les taux/forex)."""
     try:
         actif = yf.Ticker(ticker)
         prix = actif.history(period="1d")['Close'].iloc[-1]
@@ -95,8 +91,7 @@ if saisie_utilisateur:
         description_courte = '. '.join(phrases[:2]) + '.' if len(phrases) > 1 else description_complete
         st.info(description_courte)
         
-        # --- CORRECTION 1 : Largeur des colonnes ---
-        # On donne 1.5x plus de place à la colonne Secteur pour éviter que le texte soit coupé
+        # --- Largeur des colonnes ---
         col1, col2, col3, col4 = st.columns([1, 1.5, 1, 0.8])
         
         prix_actuel = info.get('currentPrice', 0)
@@ -125,10 +120,9 @@ if saisie_utilisateur:
             
             c1, c2, c3, c4 = st.columns(4)
             
-            # --- CORRECTION 2 : Affichage pur de la performance ---
+            # --- Affichage pur de la performance ---
             def afficher_metrique(col, label, valeur):
                 if valeur is not None:
-                    # Le format :+.2f force l'affichage du signe + pour les nombres positifs
                     col.metric(label, value=f"{valeur:+.2f} %")
                 else:
                     col.metric(label, "N/A")
