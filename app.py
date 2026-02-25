@@ -190,7 +190,12 @@ if saisie_utilisateur:
             # Divid
             r4.metric("Rendement du Dividende", formater_metrique(info.get('dividendYield') * 100 if info.get('dividendYield') else None, "{:.2f}", "%"))
             r4.metric("Price to Book (P/B)", formater_metrique(info.get('priceToBook')))
-            r4.metric("Dernier Div. Date", info.get('exDividendDate', 'N/A'))
+            date_div_brute = info.get('exDividendDate')
+            if date_div_brute:
+                date_div_formatee = datetime.fromtimestamp(date_div_brute).strftime('%d/%m/%Y')
+            else:
+                date_div_formatee = "N/A"
+            r4.metric("Dernier Div. Date", date_div_formatee) 
 
         # ACTUALITÉS
         with tab3:
