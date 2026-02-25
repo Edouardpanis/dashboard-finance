@@ -194,7 +194,7 @@ if saisie_utilisateur:
 
         # ACTUALITÉS
         with tab3:
-            st.markdown("### Flux d'Information en Continu")
+            st.markdown("### Flux d'Info")
             news = recuperer_actualites(ticker_symbol)
             if news:
                 for article in news:
