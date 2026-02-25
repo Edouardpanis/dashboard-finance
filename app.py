@@ -179,8 +179,8 @@ if saisie_utilisateur:
             
             # Renta
             r2.metric("Marge Nette", formater_metrique(info.get('profitMargins') * 100 if info.get('profitMargins') else None, "{:.2f}", "%"))
-            r2.metric("ROE (Return on Equity)", formater_metrique(info.get('returnOnEquity') * 100 if info.get('returnOnEquity') else None, "{:.2f}", "%"))
-            r2.metric("ROA (Return on Assets)", formater_metrique(info.get('returnOnAssets') * 100 if info.get('returnOnAssets') else None, "{:.2f}", "%"))
+            r2.metric("ROE ", formater_metrique(info.get('returnOnEquity') * 100 if info.get('returnOnEquity') else None, "{:.2f}", "%"))
+            r2.metric("ROA ", formater_metrique(info.get('returnOnAssets') * 100 if info.get('returnOnAssets') else None, "{:.2f}", "%"))
             
             # Risque
             r3.metric("Bêta (1Y)", formater_metrique(info.get('beta')))
