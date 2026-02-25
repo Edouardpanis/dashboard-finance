@@ -169,7 +169,7 @@ if saisie_utilisateur:
 
         # RATIO
         with tab2:
-            st.markdown("### Métriques de Valorisation et Structure")
+            st.markdown("### Ratios")
             r1, r2, r3, r4 = st.columns(4)
             
             # Valo
