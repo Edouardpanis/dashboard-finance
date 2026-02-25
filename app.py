@@ -89,7 +89,7 @@ def recuperer_valeur_marche(ticker: str) -> float:
 
 st.set_page_config(page_title="Dashboard Bourse Pro", layout="wide", page_icon="📈")
 
-# --- BARRE LATÉRALE : MACROÉCONOMIE ---
+# MACRO
 with st.sidebar:
     st.header("🌍 Vue Macroéconomique")
     
