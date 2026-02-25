@@ -4,6 +4,8 @@ import requests
 import pandas as pd
 from datetime import datetime
 import xml.etree.ElementTree as ET
+import plotly.graph_objects as go
+
 
 
 
@@ -85,11 +87,11 @@ def recuperer_valeur_marche(ticker: str) -> float:
         return None
     return None
 
-# CONFIGURATION DE L'INTERFACE
+# CONFIGUE INTERFACE
 
 st.set_page_config(page_title="Dashboard Bourse Pro", layout="wide", page_icon="📈")
 
-# MACRO
+# BARRE MACROÉCONOMIE 
 with st.sidebar:
     st.header("🌍 Vue Macroéconomique")
     
@@ -114,7 +116,7 @@ with st.sidebar:
         if taux:
             st.metric(label=nom_paire, value=formater_metrique(taux, "{:.4f}"))
 
-# DASHBOARD : ANALYSE MICRO
+# DASHBOARD 
 
 
 st.title("📊 ANALYSE D'ENTREPRISE 📊")
@@ -144,9 +146,8 @@ if saisie_utilisateur:
         
         st.divider()
         
-        # D'ANALYSE 
-        tab1, tab2, tab3 = st.tabs(["📈 Dynamique des Prix", "🔎 Analyse Fondamentale", "📰 Actualités Récents"])
-        
+        # ANALYSE 
+        tab1, tab2, tab3, tab4 = st.tabs(["📈 Dynamique des Prix", "🔎 Analyse Fondamentale", "📅 Historique (Earnings & Div)", "📰 Actualités"])        
         # GRAPH
         with tab1:
             historique = stock.history(period="1y")
@@ -166,10 +167,69 @@ if saisie_utilisateur:
                 st.line_chart(historique['Close'], use_container_width=True)
             else:
                 st.warning("Données historiques non disponibles.")
+        
+        # HISTORIQUE 
+        with tab3:
+            col_gauche, col_droite = st.columns(2)
+            
+            with col_gauche:
+                st.markdown("### 💰 Historique des Dividendes")
+                historique_div = stock.dividends
+                if not historique_div.empty:
+                    derniers_div = historique_div.tail(10).sort_index(ascending=False)
+                    derniers_div.index = derniers_div.index.strftime('%d/%m/%Y')
+                    st.dataframe(derniers_div, use_container_width=True)
+                else:
+                    st.info("Cette entreprise ne verse pas de dividendes.")
+                    
+            with col_droite:
+                st.markdown("### 📊 Historique des Bénéfices")
+                compte_resultat = stock.income_stmt
+                if not compte_resultat.empty:
+                    donnees_fin = compte_resultat.T
+                    
+                    if 'Total Revenue' in donnees_fin.columns and 'Net Income' in donnees_fin.columns:
+                        graph_data = donnees_fin[['Total Revenue', 'Net Income']].sort_index()
+                        annees = graph_data.index.year.astype(str)
+                        
+                        # graphique 
+                        fig = go.Figure()
+                        
+                        # Barre du Chiffre d'Affaires 
+                        fig.add_trace(go.Bar(
+                            x=annees, 
+                            y=graph_data['Total Revenue'], 
+                            name="Chiffre d'Affaires", 
+                            marker_color='#8ab4f8'
+                        ))
+                        
+                        # Barre du Résultat 
+                        fig.add_trace(go.Bar(
+                            x=annees, 
+                            y=graph_data['Net Income'], 
+                            name="Résultat Net", 
+                            marker_color='#1967d2'
+                        ))
+                        
+                        # Mise en page 
+                        fig.update_layout(
+                            barmode='group', 
+                            margin=dict(l=0, r=0, t=10, b=0),
+                            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            yaxis=dict(showgrid=True, gridcolor='lightgrey')
+                        )
+                        
+                        # Affichage 
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        st.warning("Données insuffisantes pour le graphique.")
+                else:
+                    st.info("Aucun compte de résultat disponible.")
 
         # RATIO
         with tab2:
-            st.markdown("### Ratios")
+            st.markdown("### Métriques de Valorisation et Structure")
             r1, r2, r3, r4 = st.columns(4)
             
             # Valo
@@ -188,8 +248,15 @@ if saisie_utilisateur:
             r3.metric("Current Ratio", formater_metrique(info.get('currentRatio')))
             
             # Divid
-            r4.metric("Rendement du Dividende", formater_metrique(info.get('dividendYield') * 100 if info.get('dividendYield') else None, "{:.2f}", "%"))
+            div_rate = info.get('dividendRate')
+            if div_rate and prix:
+                rendement_div = (div_rate / prix) * 100
+            else:
+                rendement_div = None
+                
+            r4.metric("Rendement du Dividende", formater_metrique(rendement_div, "{:.2f}", "%"))
             r4.metric("Price to Book (P/B)", formater_metrique(info.get('priceToBook')))
+            
             date_div_brute = info.get('exDividendDate')
             if date_div_brute:
                 date_div_formatee = datetime.fromtimestamp(date_div_brute).strftime('%d/%m/%Y')
@@ -197,9 +264,9 @@ if saisie_utilisateur:
                 date_div_formatee = "N/A"
             r4.metric("Dernier Div. Date", date_div_formatee) 
 
-        # ACTUALITÉS
-        with tab3:
-            st.markdown("### Flux d'Info")
+        # ACTU
+        with tab4:
+            st.markdown("### Flux d'Information en Continu")
             news = recuperer_actualites(ticker_symbol)
             if news:
                 for article in news:
