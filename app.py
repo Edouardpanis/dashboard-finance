@@ -99,8 +99,8 @@ with st.sidebar:
     us_10y = recuperer_valeur_marche("^TNX")
     st.metric(label="🇺🇸 US Treasury", value=formater_metrique(us_10y, "{:.3f}", "%"))
     
-    st.metric(label="🇫🇷 OAT France", value="2.85 %", help="Valeur indicative (Limitation API)")
-    st.metric(label="🇩🇪 Bund Allemagne", value="2.35 %", help="Valeur indicative (Limitation API)")
+    st.metric(label="🇫🇷 OAT France", value="3,41 %", help="Valeur indicative (Limitation API)")
+    st.metric(label="🇩🇪 Bund Allemagne", value="2.77 %", help="Valeur indicative (Limitation API)")
     
     st.divider()
     
