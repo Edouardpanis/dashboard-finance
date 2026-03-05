@@ -121,7 +121,7 @@ with st.sidebar:
 
 st.title("📊 ANALYSE D'ENTREPRISE 📊")
 
-saisie_utilisateur = st.text_input("Recherche d'actif (Nom de l'entreprise ou Ticker) :", "BNP Paribas")
+saisie_utilisateur = st.text_input("Recherche d'actif (Nom de l'entreprise ou Ticker) :", "AAPL")
 
 if saisie_utilisateur:
     ticker_symbol = trouver_ticker(saisie_utilisateur)
