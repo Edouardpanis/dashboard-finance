@@ -89,6 +89,16 @@ def recuperer_valeur_marche(ticker: str) -> float:
 
 # CONFIGUE INTERFACE
 
+@st.cache_data(ttl=3600)
+def obtenir_infos_entreprise(ticker):
+    """Tente de récupérer les infos, renvoie None si Yahoo bloque la requête."""
+    try:
+        stock = yf.Ticker(ticker)
+        infos = stock.info
+        return infos
+    except Exception:
+        return None
+
 st.set_page_config(page_title="Dashboard Bourse Pro", layout="wide", page_icon="📈")
 
 # BARRE MACROÉCONOMIE 
@@ -128,7 +138,12 @@ if saisie_utilisateur:
     
     if ticker_symbol:
         stock = yf.Ticker(ticker_symbol)
-        info = stock.info
+        info = obtenir_infos_entreprise(ticker_symbol)
+        
+        ## Si Yahoo bloque 
+        if not info:
+            st.warning("⚠️ L'API gratuite de Yahoo Finance bloque temporairement les requêtes de ce serveur cloud (Rate Limit). Veuillez réessayer plus tard.")
+            st.stop() 
         
         # EN-TÊTE 
         col_header, col_price = st.columns([3, 1])
